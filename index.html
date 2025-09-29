@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PariPS GTPS</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f2027;
+      color: white;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    /* Background canvas */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    header {
+      padding: 30px 20px;
+    }
+
+    h1 {
+      font-size: 3em;
+      font-weight: bold;
+      background: linear-gradient(
+        270deg,
+        red,
+        orange,
+        yellow,
+        green,
+        cyan,
+        blue,
+        violet,
+        red
+      );
+      background-size: 800% 800%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: rgbFlow 10s linear infinite;
+      text-shadow: 0 0 10px rgba(255,255,255,0.7),
+                   0 0 20px rgba(255,255,255,0.5);
+      margin: 0;
+    }
+
+    @keyframes rgbFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    p.description {
+      font-size: 1.2em;
+      max-width: 700px;
+      margin: 10px auto 30px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 800px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    a {
+      color: #00e6ff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    pre {
+      text-align: left;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      text-transform: uppercase;
+    }
+
+    .status-online {
+      color: #00ff7f;
+      font-weight: bold;
+    }
+
+    .status-offline {
+      color: #ff4d4d;
+      font-weight: bold;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 8px;
+      background: #00e6ff;
+      color: #000;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #00bcd4;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background canvas untuk bintang -->
+  <canvas id="stars"></canvas>
+
+  <header>
+    <h1>PariPS GTPS</h1>
+    <p class="description">
+      PariPS adalah server GTPS (Growtopia Private Server) dengan fitur menarik dan stabilitas tinggi.  
+      Mainkan sekarang dan rasakan pengalaman baru!
+    </p>
+  </header>
+
+  <div class="card">
+    <h2>📡 STATUS SERVER</h2>
+    <p id="server-status">⏳ MENGECEK...</p>
+    <button onclick="checkServer()">REFRESH STATUS</button>
+  </div>
+
+  <div class="card">
+    <h2>🔗 DOWNLOAD VHOST</h2>
+    <p>
+      <a href="https://www.mediafire.com/file/b89gxduhgawg0ds/growsoft.txt/file" target="_blank">
+        KLIK DI SINI UNTUK DOWNLOAD VHOST
+      </a>
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>📱 COPY PTUNNEL (ANDROID)</h2>
+    <p id="ptunnel-link">
+      https://growsoft.cc/android.txt
+    </p>
+    <a href="https://growsoft.cc/android.txt" target="_blank">BUKA PTUNNEL</a>
+    <br>
+    <button onclick="copyPtunnel()">COPY LINK</button>
+  </div>
+
+  <div class="card">
+    <h2>🖥️ COPY WINDOWS HOSTS</h2>
+    <pre id="windows-hosts">
+91.134.85.13 GROWTOPIA1.COM
+91.134.85.13 GROWTOPIA2.COM
+91.134.85.13 WWW.GROWTOPIA1.COM
+91.134.85.13 WWW.GROWTOPIA2.COM
+    </pre>
+    <button onclick="copyWindows()">COPY</button>
+  </div>
+
+  <script>
+    // Cek status server
+    async function checkServer() {
+      const statusEl = document.getElementById("server-status");
+      statusEl.innerHTML = "⏳ MENGECEK...";
+      try {
+        await fetch("http://91.134.85.13", { mode: "no-cors" });
+        statusEl.innerHTML = "🟢 <span class='status-online'>ONLINE</span>";
+      } catch (error) {
+        statusEl.innerHTML = "🔴 <span class='status-offline'>OFFLINE</span>";
+      }
+    }
+    checkServer();
+
+    // Animasi bintang
+    const canvas = document.getElementById("stars");
+    const ctx = canvas.getContext("2d");
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    function createStars() {
+      stars = [];
+      for (let i = 0; i < 150; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5,
+          speed: Math.random() * 0.5 + 0.2
+        });
+      }
+    }
+
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      for (let star of stars) {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function moveStars() {
+      for (let star of stars) {
+        star.y += star.speed;
+        if (star.y > canvas.height) {
+          star.y = 0;
+          star.x = Math.random() * canvas.width;
+        }
+      }
+    }
+
+    function animateStars() {
+      drawStars();
+      moveStars();
+      requestAnimationFrame(animateStars);
+    }
+
+    createStars();
+    animateStars();
+
+    // Copy host file
+    function copyWindows() {
+      const text = document.getElementById("windows-hosts").innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("✅ Host Windows berhasil dicopy!");
+      });
+    }
+
+    // Copy ptunnel link
+    function copyPtunnel() {
+      const text = document.getElementById("ptunnel-link").innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("✅ Link Ptunnel berhasil dicopy!");
+      });
+    }
+  </script>
+</body>
+</html>
